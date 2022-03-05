@@ -1,0 +1,8 @@
+__pycache__
+.env
+.history
+.hypothesis/
+build/
+reports/
+package-lock.json
+package.json
