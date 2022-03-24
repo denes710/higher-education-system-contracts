@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 import "../../../interfaces/Token/ERC1238/IERC1238.sol";
 import "../../../interfaces/Token/ERC1238/IERC1238Metadata.sol";
 
-import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
@@ -60,15 +60,6 @@ contract ERC1238 is Context, ERC165, IERC1238, IERC1238Metadata {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC1238URIStorage: URI query for nonexistent token");
         return _tokenURIs[tokenId];
-    }
-
-    /**
-     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
-     * token will be the concatenation of the `baseURI` and the `tokenId`. Empty
-     * by default, can be overridden in child contracts.
-     */
-    function _baseURI() internal view virtual returns (string memory) {
-        return "";
     }
 
     // Returns the token ID owned by `owner`, if it exists, and 0 otherwise
