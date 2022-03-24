@@ -2,10 +2,9 @@
 pragma solidity ^0.8.0;
 
 library Common {
-    enum EState { offSeason, applying, active }
+    enum EState { offSeason, planning, applying, active }
 
-    struct State
-    {
+    struct State {
         EState _state;
     }
 
@@ -15,7 +14,9 @@ library Common {
 
     function nextState(State storage state) internal {
         if (state._state == EState.offSeason) {
-            state._state = EState.applying;  
+            state._state = EState.planning;
+        } else if (state._state == EState.planning) {
+            state._state = EState.applying;
         } else if (state._state == EState.applying) {
             state._state = EState.active;
         } else if (state._state == EState.active) {
