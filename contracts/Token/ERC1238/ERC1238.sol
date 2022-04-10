@@ -10,7 +10,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-// TODO adds and rewrites comments
 contract ERC1238 is Context, ERC165, IERC1238, IERC1238Metadata {
     using Address for address;
     using Strings for uint256;
@@ -38,77 +37,65 @@ contract ERC1238 is Context, ERC165, IERC1238, IERC1238Metadata {
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId_) public view virtual override(ERC165, IERC165) returns (bool) {
         return
-            interfaceId == type(IERC1238).interfaceId ||
-            super.supportsInterface(interfaceId);
+            interfaceId_ == type(IERC1238).interfaceId ||
+            super.supportsInterface(interfaceId_);
     }
 
-    // Returns the badge's name
+    /// @dev Returns the badge's name
     function name() public view virtual override returns (string memory) {
         return _name;
     }
 
-    // Returns the badge's symbol
+    /// @dev Returns the badge's symbol
     function symbol() public view virtual override returns (string memory) {
         return _symbol;
     }
 
     /**
-     * @dev See {IERC721Metadata-tokenURI}.
+     * @dev See {IERC1238Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "ERC1238URIStorage: URI query for nonexistent token");
-        return _tokenURIs[tokenId];
+    function tokenURI(uint256 tokenId_) public view virtual override returns (string memory) {
+        require(_exists(tokenId_), "ERC1238URIStorage: URI query for nonexistent token");
+        return _tokenURIs[tokenId_];
     }
 
-    // Returns the token ID owned by `owner`, if it exists, and 0 otherwise
-    function balanceOf(address owner)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
-        require(owner != address(0), "Invalid owner at zero address");
-        return _balances[owner];
+    // Returns the number of tokens owned by `owner`
+    function balanceOf(address owner_) public view virtual override returns (uint256) {
+        require(owner_ != address(0), "Invalid owner at zero address");
+        return _balances[owner_];
     }
 
-    // Returns the owner of a given token ID, reverts if the token does not exist
-    function ownerOf(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
-        require(_exists(tokenId), "Token is not minted");
-        address owner = _owners[tokenId];
+    /// @dev Returns the owner of a given token ID, reverts if the token does not exist
+    function ownerOf(uint256 tokenId_) public view virtual override returns (address) {
+        require(_exists(tokenId_), "Token is not minted");
+        address owner = _owners[tokenId_];
         require(owner != address(0), "Invalid owner at zero address");
         return owner;
     }
 
-    // Checks if a token ID exists
-    function _exists(uint256 tokenId) internal view virtual returns (bool) {
-        return _owners[tokenId] != address(0);
+    /// @dev Checks if a token ID exists
+    function _exists(uint256 tokenId_) internal view virtual returns (bool) {
+        return _owners[tokenId_] != address(0);
     }
 
-    // @dev Mints `tokenId` and transfers it to `to`.
-    function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "Invalid owner at zero address");
-        require(!_exists(tokenId), "Token already minted");
+    /// @dev Mints `tokenId` and transfers it to `to`.
+    function _mint(address to_, uint256 tokenId_) internal virtual {
+        require(to_ != address(0), "Invalid owner at zero address");
+        require(!_exists(tokenId_), "Token already minted");
 
-        _balances[to] += 1;
-        _owners[tokenId] = to;
+        _balances[to_] += 1;
+        _owners[tokenId_] = to_;
 
-        emit Minted(to, tokenId);
+        emit Minted(to_, tokenId_);
     }
 
-    // @dev Burns `tokenId`.
-    function _burn(uint256 tokenId) internal virtual {
-        address owner = ERC1238.ownerOf(tokenId);
+    /// @dev Burns `tokenId`.
+    function _burn(uint256 tokenId_) internal virtual {
+        address owner = ERC1238.ownerOf(tokenId_);
 
-        delete _owners[tokenId];
+        delete _owners[tokenId_];
 
         if (_balances[owner] == 1) {
             delete _balances[owner];
@@ -116,23 +103,20 @@ contract ERC1238 is Context, ERC165, IERC1238, IERC1238Metadata {
             _balances[owner] -= 1;
         }
 
-        if (bytes(_tokenURIs[tokenId]).length != 0) {
-            delete _tokenURIs[tokenId];
+        if (bytes(_tokenURIs[tokenId_]).length != 0) {
+            delete _tokenURIs[tokenId_];
         }
 
-        emit Burned(owner, tokenId);
+        emit Burned(owner, tokenId_);
     }
 
     /**
      * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
      */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
-        require(_exists(tokenId), "ERC1238URIStorage: URI set of nonexistent token");
-        require(_owners[tokenId] == _msgSender(), "ERC1238URIStorage: TODO");
-        _tokenURIs[tokenId] = _tokenURI;
+    function _setTokenURI(uint256 tokenId_, string memory tokenURI_) internal virtual {
+        require(_exists(tokenId_), "ERC1238URIStorage: URI set of nonexistent token");
+        require(_owners[tokenId_] == _msgSender(), "ERC1238URIStorage: Sender address is not the owner of the token!");
+        _tokenURIs[tokenId_] = tokenURI_;
+        emit TokenURISet(tokenId_, tokenURI_);
     }
 }
