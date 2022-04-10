@@ -6,3 +6,4 @@ build/
 reports/
 package-lock.json
 package.json
+main.code-workspace
