@@ -14,6 +14,9 @@ contract Degree is Ownable, ERC1238, IDegree {
     // mapping degree with credit value
     mapping(uint256 => uint32) public creditValues;
 
+    // mapping degree with hash value
+    mapping(uint256 => uint32) public hashValues;
+
     // last degree unique id
     Counters.Counter private _tokenId;
 
@@ -33,5 +36,10 @@ contract Degree is Ownable, ERC1238, IDegree {
 
     function setTokenURI(uint256 tokenId_, string memory tokenURI_) virtual public {
         super._setTokenURI(tokenId_, tokenURI_);
+    }
+
+    function setHash(uint256 tokenId_, uint32 hash_) onlyOwner public {
+        hashValues[tokenId_] = hash_;
+        emit HashValue(tokenId_, hash_);
     }
 }

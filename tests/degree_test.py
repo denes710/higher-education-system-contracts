@@ -13,5 +13,7 @@ def test_create_degree(degree):
     assert degree.ownerOf(1) == accounts[1]
     degree.setTokenURI(1, "uri", {'from': accounts[1]})
     assert degree.tokenURI(1) == "uri"
+    degree.setHash(1, 12345, {'from': accounts[0]})
+    assert degree.hashValues(1) == 12345
     credit_value = degree.creditValues(1)
     assert credit_value == 14333

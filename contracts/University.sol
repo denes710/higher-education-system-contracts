@@ -89,6 +89,12 @@ contract University is Ownable, IUniversity {
         degree.mint(_msgSender(), sumMarks, sumCredits);
     }
 
+    function setHashDegree(uint256 tokenId_, uint32 hash_) onlyOwner inOffSeason public {
+        require(degree.ownerOf(tokenId_) != address(0), "Token ID is not minted yet!");
+        require(degree.hashValues(tokenId_) == 0, "Hash is already set!");
+        degree.setHash(tokenId_, hash_);
+    }
+
     function applyForCourse(uint256 courseId_, uint256 studentId_) onlyStudent inApplying public {
         require(student.ownerOf(studentId_) == _msgSender(), "You are not the owner this id!");
         require(universityToken.balanceOf(_msgSender()) >= semesters[semesterId.current()].prices(courseId_),

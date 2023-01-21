@@ -158,9 +158,11 @@ def test_mint_degree():
     with reverts("Sender does not own the token!"):
         university.mintDegree(1, {'from': accounts[3]})
     university.mintDegree(1, {'from': accounts[2]})
+    university.setHashDegree(1, 12345, {'from': accounts[0]})
     degree = Contract.from_abi("Degree", university.degree(), Degree.abi)
     assert degree.ownerOf(1) == accounts[2]
     assert degree.balanceOf(accounts[2]) == 1
+    assert degree.hashValues(1) == 12345
 
 def test_course_listing(fixture_listing):
     university, _ = fixture_listing
