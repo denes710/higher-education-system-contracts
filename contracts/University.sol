@@ -116,17 +116,6 @@ contract University is Ownable, IUniversity {
         emit CancelListing(semesterId.current(), tokenId_, studentId_);
     }
 
-    function courseBuying(uint256 tokenId_, uint256 studentId_) onlyStudent inTrading public {
-        require(student.ownerOf(studentId_) == _msgSender(), "Sender does not own the token!");
-        require(semesters[semesterId.current()].ownerOf(tokenId_) == address(this), "This token is not listed!");
-        // FIXME maybe double check the buyer is not owner of another token from this course
-        universityToken.transferFrom(_msgSender(), listings[semesterId.current()][tokenId_].owner,
-            listings[semesterId.current()][tokenId_].price);
-        semesters[semesterId.current()].transferFrom(address(this), _msgSender(), tokenId_);
-        delete listings[semesterId.current()][tokenId_];
-        emit CourseBuying(semesterId.current(), tokenId_, studentId_);
-    }
-
     // Semester
     function createNewSemester() onlyOwner inOffSeason public {
         require(currentState.current() == Common.EState.offSeason);

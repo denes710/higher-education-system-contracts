@@ -20,11 +20,4 @@ interface IUniversity {
         uint256 indexed tokenId,
         uint256 indexed studentId
     );
-
-    /// @dev Emitted when `tokenId` token is bought by the owner of `studentId` token in `semesterId` semester.
-    event CourseBuying(
-        uint256 indexed semesterId,
-        uint256 indexed tokenId,
-        uint256 indexed buyerStudentId
-    );
 }

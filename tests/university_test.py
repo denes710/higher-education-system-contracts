@@ -201,20 +201,3 @@ def test_cancel_listing(fixture_listing):
     university.setNextState({'from': accounts[0]})
     with reverts("This is not the trading state!"):
         university.cancelListing(1, 1, {'from': accounts[2]})
-
-def test_course_buying(fixture_listing):
-    university, universityToken = fixture_listing
-    semester = Contract.from_abi("Semester", university.semesters(university.semesterId()), Semester.abi)
-    semester.claim(1, 1, {'from': accounts[2]})
-    semester.approve(university, 1, {'from': accounts[2]})
-    university.courseListing(1, 1, 20, {'from': accounts[2]})
-    universityToken.approve(university, 20, {'from': accounts[3]})
-    university.courseBuying(1, 2, {'from': accounts[3]})
-    assert semester.balanceOf(accounts[2]) == 0
-    assert semester.balanceOf(accounts[3]) == 1
-    assert semester.balanceOf(university) == 0
-    assert universityToken.balanceOf(accounts[2]) == 115
-    assert universityToken.balanceOf(accounts[3]) == 80
-    owner, price = university.listings(1, 1)
-    assert owner == to_address("0x0000000000000000000000000000000000000000")
-    assert price == 0

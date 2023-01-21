@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// FIXME reference the original project is necessary
+// The original library is found in this repo: https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
+
 library OrderedList {
     struct Node {
         uint parent;
