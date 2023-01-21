@@ -9,7 +9,6 @@ import "./Degree.sol";
 import "./Person.sol";
 import "./Semester.sol";
 import "./Student.sol";
-import "./UniversityToken.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -18,19 +17,12 @@ contract University is Ownable, IUniversity {
     using Counters for Counters.Counter;
     using Common for Common.State;
 
-    struct ListItem {
-        address owner;
-        uint256 price;
-    }
-
     // current ongoing semester id
     Counters.Counter public semesterId;
     // current state of the university
     Common.State public currentState;
     // semester id - semester contract
     mapping(uint256 => Semester) public semesters;
-    // semester id - token id (course) - original owner
-    mapping(uint256 => mapping (uint256 => ListItem)) public listings;
 
     // smart contract for tracking teachers
     Person public teacher;
@@ -40,32 +32,26 @@ contract University is Ownable, IUniversity {
     Degree public degree;
     // smart contract for tracking available courses at university
     CourseCatalog public courseCatalog;
-    // smart contract for maintaining ERC20 token for university
-    UniversityToken public universityToken;
 
     constructor() {
         teacher = new Person("Teacher", "tch");
         student = new Student("Student", "std");
         courseCatalog = new CourseCatalog("CourseCatalog", "coc", address(this));
         degree = new Degree("Degree", "deg");
-        universityToken = new UniversityToken("UniversityToken", "unt");
         currentState.init();
     }
 
     // Teacher
     function createTeacher(address to_) onlyOwner inOffSeason public {
         teacher.mint(to_);
-        universityToken.addNewTeacher(to_);
     }
 
     function addMyCourseNextSemester(
         uint256 courseId_,
-        uint8 numberOfStudents_,
-        uint256 price_
+        uint8 numberOfStudents_
     ) onlyTeacher inPlanning public {
         require(courseCatalog.ownerOf(courseId_) == _msgSender(), "You do not own this token!");
-        universityToken.transferFrom(_msgSender(), address(this), 10);
-        semesters[semesterId.current()].addNewCourse(courseId_, numberOfStudents_, price_);
+        semesters[semesterId.current()].addNewCourse(courseId_, numberOfStudents_);
     }
 
     function markStudent(uint256 tokenId_, uint8 mark_) onlyTeacher inActice public {
@@ -79,7 +65,6 @@ contract University is Ownable, IUniversity {
     // Student
     function createStudent(address to_) onlyOwner inOffSeason public {
         student.mint(to_);
-        universityToken.addNewStudent(to_);
     }
 
     function mintDegree(uint256 tokenId_) onlyStudent inOffSeason public {
@@ -97,29 +82,8 @@ contract University is Ownable, IUniversity {
 
     function applyForCourse(uint256 courseId_, uint256 studentId_) onlyStudent inApplying public {
         require(student.ownerOf(studentId_) == _msgSender(), "You are not the owner this id!");
-        require(universityToken.balanceOf(_msgSender()) >= semesters[semesterId.current()].prices(courseId_),
-        "You have not got enough token to apply for this course!");
         (uint16 sumcredits, uint16 sumMarks,) = student.students(studentId_);
         semesters[semesterId.current()].applyForCourse(courseId_, studentId_, sumMarks * sumcredits);
-        universityToken.transferFrom(_msgSender(), address(this), semesters[semesterId.current()].prices(courseId_));
-    }
-
-    function courseListing(uint256 tokenId_, uint256 studentId_, uint256 price_) onlyStudent inTrading public {
-        require(student.ownerOf(studentId_) == _msgSender(), "Sender does not own the token!");
-        require(semesters[semesterId.current()].ownerOf(tokenId_) == _msgSender(), "Sender does not own the token!");
-        semesters[semesterId.current()].transferFrom(_msgSender(), address(this), tokenId_);
-        listings[semesterId.current()][tokenId_].owner = _msgSender();
-        listings[semesterId.current()][tokenId_].price = price_;
-        emit CourseListing(semesterId.current(), tokenId_, studentId_, price_);
-    }
-
-    function cancelListing(uint256 tokenId_, uint256 studentId_) onlyStudent inTrading public {
-        require(student.ownerOf(studentId_) == _msgSender(), "Sender does not own the token!");
-        require(semesters[semesterId.current()].ownerOf(tokenId_) == address(this), "This token is not listed!");
-        require(listings[semesterId.current()][tokenId_].owner  == _msgSender(), "You must be the token owner!");
-        semesters[semesterId.current()].transferFrom(address(this), _msgSender(), tokenId_);
-        delete listings[semesterId.current()][tokenId_];
-        emit CancelListing(semesterId.current(), tokenId_, studentId_);
     }
 
     // Semester

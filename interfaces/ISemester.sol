@@ -9,8 +9,7 @@ interface ISemester {
     /// @dev Emitted when `tokenId` token is minted with `creditValue`.
     event AddNewCourse(
         uint256 indexed courseId,
-        uint16 indexed numberOfStudents,
-        uint256 indexed price
+        uint16 indexed numberOfStudents
     );
 
     /// @dev Emitted when semester sets a `newState`.

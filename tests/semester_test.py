@@ -23,9 +23,8 @@ def fixture():
 def test_semester_default_functionality(fixture):
     _, semester = fixture
     # adds a course
-    semester.addNewCourse(1, 10, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 10, {'from': accounts[0]})
     assert semester.balanceOf(accounts[1]) == 0
-    assert semester.prices(1) == 5
     # claims a place
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
@@ -51,7 +50,7 @@ def test_mark_student(fixture):
         semester.markStudent(1, 5, {'from': accounts[1]})
     with reverts("This is not the active state!"):
         semester.markStudent(1, 5, {'from': accounts[0]})
-    semester.addNewCourse(1, 10, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 10, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
@@ -74,19 +73,18 @@ def test_next_state(fixture):
 
 def test_add_new_course(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 10, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 10, {'from': accounts[0]})
     with reverts("This course is already added!"):
-        semester.addNewCourse(1, 10, 5, {'from': accounts[0]})
+        semester.addNewCourse(1, 10, {'from': accounts[0]})
     with reverts("Ownable: caller is not the owner"):
-        semester.addNewCourse(2, 10, 5, {'from': accounts[2]})
+        semester.addNewCourse(2, 10, {'from': accounts[2]})
     semester.setNextState({'from': accounts[0]})
     with reverts("This is not the planning state!"):
-        semester.addNewCourse(2, 10, 5, {'from': accounts[0]})
-    assert semester.prices(1) == 5
+        semester.addNewCourse(2, 10, {'from': accounts[0]})
 
 def test_apply_for_course(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 2, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 2, {'from': accounts[0]})
     with reverts("This is not the applying state!"):
         semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
@@ -96,7 +94,7 @@ def test_apply_for_course(fixture):
 
 def test_limit_of_course(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 2, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 2, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     semester.applyForCourse(1, 2, 4, {'from': accounts[0]})
@@ -112,7 +110,7 @@ def test_limit_of_course(fixture):
 
 def test_claim(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 2, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 2, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     with reverts("This is not the trading state!"):
@@ -133,7 +131,7 @@ def test_claim(fixture):
 
 def test_changing_in_tree(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 2, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 2, {'from': accounts[0]})
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     semester.applyForCourse(1, 2, 4, {'from': accounts[0]})
@@ -152,11 +150,9 @@ def test_changing_in_tree(fixture):
 
 def test_more_courses(fixture):
     _, semester = fixture
-    semester.addNewCourse(1, 1, 5, {'from': accounts[0]})
-    semester.addNewCourse(3, 1, 3, {'from': accounts[0]})
+    semester.addNewCourse(1, 1, {'from': accounts[0]})
+    semester.addNewCourse(3, 1, {'from': accounts[0]})
     assert semester.balanceOf(accounts[1]) == 0
-    assert semester.prices(1) == 5
-    assert semester.prices(3) == 3
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 3, {'from': accounts[0]})
     semester.applyForCourse(3, 1, 3, {'from': accounts[0]})
@@ -177,7 +173,7 @@ def test_transfers(fixture):
         with reverts("This is not the trading state!"):
             semester.safeTransferFrom(accounts[3], accounts[0], 1, {'from': accounts[0]})
     _, semester = fixture
-    semester.addNewCourse(1, 10, 5, {'from': accounts[0]})
+    semester.addNewCourse(1, 10, {'from': accounts[0]})
     trading_state_check()
     semester.setNextState({'from': accounts[0]})
     semester.applyForCourse(1, 1, 4, {'from': accounts[0]})

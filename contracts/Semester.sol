@@ -26,8 +26,6 @@ contract Semester is Ownable, ISemester, ERC721 {
     mapping(uint256 => uint256) public studentIds;
     // tokenid - course id
     mapping(uint256 => uint256) public courseIds;
-    // course id - price
-    mapping(uint256 => uint256) public prices;
 
     // main university smart contract
     University private _university;
@@ -46,12 +44,11 @@ contract Semester is Ownable, ISemester, ERC721 {
         semesterId = semesterId_;
     }
 
-    function addNewCourse(uint256 courseId_, uint16 numberOfStudents_, uint256 price_) onlyOwner inPlanning public {
+    function addNewCourse(uint256 courseId_, uint16 numberOfStudents_) onlyOwner inPlanning public {
         require(_courses[courseId_].created == false, "This course is already added!");
         _courses[courseId_].created = true;
         _courses[courseId_].limit = numberOfStudents_;
-        prices[courseId_] = price_;
-        emit AddNewCourse(courseId_, numberOfStudents_, price_);
+        emit AddNewCourse(courseId_, numberOfStudents_);
     }
 
     function setNextState() onlyOwner public {
